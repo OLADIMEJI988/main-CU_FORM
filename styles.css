@@ -1,0 +1,309 @@
+/* import fonts from fonts css file */
+@import url(./fonts.css);
+
+*{
+    box-sizing: border-box;
+}
+
+body{
+    font-family: "Roboto", cursive !important;
+}
+
+.preview-page{
+    background-color: white;
+}
+
+.title{
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: 18px;
+    margin-bottom: 2rem;
+}
+
+.header{
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 14px;
+}
+
+.thesis_txt{
+    width: 265px;
+}
+
+.logo, .preview-logo{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 2rem;
+    height: 100px;
+    width: auto;
+}
+
+.preview-logo{
+    height: 115px;
+}
+
+.form{
+    border-radius: 10px;
+    padding: 2rem 2rem;
+    margin: 2.5rem 0rem;
+    width: 49pc;
+    background-color: rgb(255 255 253);
+    color: rgb(45 47 58);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-label{
+    font-weight: 500;
+    margin-top: 5px;
+    font-size: 15px;
+}
+
+.form-label-date{
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.form-control{
+    border-width: 1.5px;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.thesis{
+    display: flex;
+}
+
+.rank{
+    width: 180px;
+}
+
+.recommendationTxt{
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.comment-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    height: 250px; 
+    padding-top: 20px;
+}
+
+.commentTxt{
+    font-weight: 500;
+}
+
+.commentSection{
+    border-width: 1.5px;
+    border-radius: 10px;
+    padding: 10px 15px;
+    font-weight: 500;
+    width: 80%;
+    max-width: 600px;
+}
+
+.btn{
+    background-color: rgb(45 47 58);
+    color: rgb(255 255 253);
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 15px 35px;
+    margin-top: 1rem;
+    font-weight: 500;
+    transition: all 1.1s ease;
+}
+
+.btn:hover{
+    background-color: #561740;
+    color: rgb(255 255 253);
+}
+
+.btn:active{
+    transform: scale(0.8);
+}
+
+.error{
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.coSupe{
+    margin-top: 30px;
+}
+
+.qual{
+    margin-top: 10px;
+}
+
+.select2-selection{
+    border: none !important;
+    margin: 0 !important;
+}
+
+.select2-dropdown{
+    margin-top: 7px;
+    border-radius: 5px;
+    border: 2px solid rgb(222 226 230);
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+.select2-results__option{
+    font-size: 0.8rem !important;
+    padding-left: 20px !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+    cursor: pointer;
+}
+
+.select2-results__option--highlighted{
+    background-color: rgb(86, 23, 64) !important;
+}
+
+.select2-results__option--highlighted:hover{
+    background-color: rgb(245, 245, 245) !important;
+    color: black !important;
+}
+
+.select2-search__field{
+    border: 2px solid rgb(86, 23, 64) !important;
+    padding: 5px !important;
+    border-radius: 4px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    font-size: 15px;
+}
+
+.select2-selection__clear{
+    font-size: 20px;
+    transform: translateX(-10px);
+}
+
+.select2-search__field::placeholder {
+    color: rgb(86, 23, 64);
+    opacity: 0.8;
+    font-style: italic;
+}
+
+.preview-page{
+    padding: 40px;
+}
+
+.formPreview{
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9; 
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 40px 30px 25px;
+}
+
+.studNamePreview, .matricPreview, .programmePreview, 
+.collegePreview, .degreePreview, .firstRegPreview, 
+.recentRegPreview, .senateApprovalPreview, .thesisPreview, 
+.supervisorNamePreview, .supervisorRankPreview, .supervisorAffiliationPreview, 
+.supervisorDepartmentPreview, .supervisorSpecialiasationPreview, .supervisorQualificationPreview,
+.coSupeNamePreview, .coSupeRankPreview, .coSupeAffiliationPreview,
+.coSupeDepartmentPreview, .coSupeSpecialisationPreview, .coSupeQualificationPreview {
+    display: flex;
+    font-size: 16px;
+    margin-left: 18px;
+}
+
+.studNamePreview p:first-child, .matricPreview p:first-child,
+.programmePreview p:first-child, .collegePreview p:first-child,
+.degreePreview p:first-child, .firstRegPreview p:first-child,
+.recentRegPreview p:first-child, .senateApprovalPreview p:first-child,
+.thesisPreview p:first-child,  .supervisorNamePreview p:first-child,
+.supervisorRankPreview p:first-child, .supervisorAffiliationPreview p:first-child,
+.supervisorDepartmentPreview p:first-child, .supervisorSpecialiasationPreview p:first-child,
+.supervisorQualificationPreview p:first-child, .coSupeNamePreview p:first-child,
+.coSupeRankPreview p:first-child, .coSupeAffiliationPreview p:first-child,
+.coSupeDepartmentPreview p:first-child, .coSupeSpecialisationPreview p:first-child,
+.coSupeQualificationPreview p:first-child{
+    font-weight: 600;
+    color: #333; 
+    margin-right: 10px;
+}
+.quali{
+    max-width: 45pc;
+}
+
+.span{
+    font-weight: 600;
+    margin-left: -6px;
+    margin-right: 10px;
+}
+
+.commentPreview{
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9; 
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 40px 30px 25px;
+    max-width: 60pc;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.studsContainer{
+    max-width: 40pc;
+    display: flex;
+    gap: 40px;
+}
+
+.holder{
+    align-items: baseline;
+}
+
+a{
+    text-decoration: none;
+    color: inherit;
+}
+
+.endorseBtn, .approveBtn, .rejectBtn{
+    border-radius: 5px;
+    max-width: 10pc;
+    font-size: 14px;
+    padding: 10px 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ccc;
+    background-color: #71488a;
+    color: rgb(255 255 253);
+}
+
+.endorseBtn:active, .notEndorsebtn:active, .approveBtn:active, .rejectBtn:active{
+    transform: scale(0.96);
+}
+
+.endorsebtn, .notEndorsebtn{
+    border-radius: 7px;
+    border: 1px solid #ccc;
+    background-color: rgb(5, 99, 5);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    color: rgb(255 255 253);
+    display: block;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding: 15px 25px;
+    margin-top: 1rem;
+    font-weight: 500;
+    transition: all 1.1s ease;
+}
+.notEndorsebtn{
+    background-color: rgb(152, 13, 13);
+}
+
+.btnContain{
+    gap: 230px;
+}
+
+.endorsebtn:hover, .notEndorsebtn:hover{
+    background-color: #71488a;
+    color: rgb(255 255 253);
+}
