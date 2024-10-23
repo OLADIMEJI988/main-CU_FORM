@@ -44,5 +44,16 @@ if ($student_id > 0) {
     echo "Invalid student ID";
 }
 
+if ($student_id > 0) {
+    $deleteSql4 = "DELETE FROM sub_dean_pending_students WHERE id = $student_id";
+    if (mysqli_query($conn, $deleteSql4)) {
+        echo "Student removed successfully";
+    } else {
+        echo "Error removing student: " . mysqli_error($conn);
+    }
+} else {
+    echo "Invalid student ID";
+}
+
 mysqli_close($conn);
 ?>

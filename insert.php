@@ -93,7 +93,7 @@ if ($student_id && !empty($comment) && !empty($action) && !empty($role)) {
         } else {
             echo 'Error preparing pgcommittee_attended_students statement: ' . $conn->error;
         }
-    } else if ($role === 'collegeDean') {
+    } elseif ($role === 'collegeDean') {
         // First SQL: Insert into college_dean_attended_students
         $sql_collegeDean = "INSERT INTO college_dean_attended_students (id, stud_name, matric_num, college_dean_comment, college_dean_action, endorsed_at)
                             SELECT id, stud_name, matric_num, ?, ?, NOW()
@@ -106,26 +106,60 @@ if ($student_id && !empty($comment) && !empty($action) && !empty($role)) {
                 // Success: Insertion into college_dean_attended_students, now update approval_status
                 $stmt_pg->close();
 
-                $sql_approval_pg = "UPDATE approval_status
-                                    SET college_dean_comment = ?
+                $sql_approval_collegeDean = "UPDATE approval_status
+                                    SET college_dean = ?
                                     WHERE stud_name = (SELECT stud_name FROM pgcommittee_attended_students WHERE id = ?)";
 
-                if ($stmt_approval_pg = $conn->prepare($sql_approval_pg)) {
-                    $stmt_approval_pg->bind_param("si", $status_action, $student_id);
-                    if ($stmt_approval_pg->execute()) {
-                        echo 'Success: Data inserted into both pgcommittee_attended_students and approval_status tables';
+                if ($stmt_approval_collegeDean = $conn->prepare($sql_approval_collegeDean)) {
+                    $stmt_approval_collegeDean->bind_param("si", $status_action, $student_id);
+                    if ($stmt_approval_collegeDean->execute()) {
+                        echo 'Success: Data inserted into both college_dean_attended_students and approval_status tables';
                     } else {
-                        echo 'Error in updating approval_status: ' . $stmt_approval_pg->error;
+                        echo 'Error in updating approval_status: ' . $stmt_approval_collegeDean->error;
                     }
-                    $stmt_approval_pg->close();
+                    $stmt_approval_collegeDean->close();
                 } else {
                     echo 'Error preparing approval_status update statement: ' . $conn->error;
                 }
             } else {
-                echo 'Error in inserting into college_dean_attended_students: ' . $stmt_pg->error;
+                echo 'Error in inserting into college_dean_attended_students: ' . $stmt_collegeDean->error;
             }
         } else {
             echo 'Error preparing college_dean_attended_students statement: ' . $conn->error;
+        }
+    } elseif ($role === 'subDean') {
+        // First SQL: Insert into college_dean_attended_students
+        $sql_subDean = "INSERT INTO sub_dean_attended_students (id, stud_name, matric_num, college_dean_comment, college_dean_action, endorsed_at)
+                            SELECT id, stud_name, matric_num, ?, ?, NOW()
+                            FROM college_dean_attended_students
+                            WHERE id = ?";
+
+        if ($stmt_pg = $conn->prepare($sql_subDean)) {
+            $stmt_pg->bind_param("ssi", $comment, $status_action, $student_id);
+            if ($stmt_pg->execute()) {
+                // Success: Insertion into college_dean_attended_students, now update approval_status
+                $stmt_subDean->close();
+
+                $sql_approval_pg = "UPDATE approval_status
+                                    SET sub_dean = ?
+                                    WHERE stud_name = (SELECT stud_name FROM college_dean_attended_students WHERE id = ?)";
+
+                if ($stmt_approval_subDean = $conn->prepare($sql_approval_subDean)) {
+                    $stmt_approval_subDean->bind_param("si", $status_action, $student_id);
+                    if ($stmt_approval_subDean->execute()) {
+                        echo 'Success: Data inserted into both sub_dean_attended_students and approval_status tables';
+                    } else {
+                        echo 'Error in updating approval_status: ' . $stmt_approval_subDean->error;
+                    }
+                    $stmt_approval_subDean->close();
+                } else {
+                    echo 'Error preparing approval_status update statement: ' . $conn->error;
+                }
+            } else {
+                echo 'Error in inserting into sub_dean_attended_students: ' . $stmt_subDean->error;
+            }
+        } else {
+            echo 'Error preparing sub_dean_attended_students statement: ' . $conn->error;
         }
     } else {
         echo 'Invalid role provided.';

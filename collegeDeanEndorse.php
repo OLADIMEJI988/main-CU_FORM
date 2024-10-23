@@ -1,6 +1,6 @@
 <?php
 // Connect to the database
-$conn = mysqli_connect('localhost', 'sholanke', 'shinnely_JR1', 'appoint_supe');
+$conn = mysqli_connect('localhost', 'sholanke', 'shinnely_JR1', 'recommend_supe');
 
 // Check connection
 if (!$conn) {
@@ -16,7 +16,7 @@ $student_id = isset($_GET['id']) ? mysqli_real_escape_string($conn, $_GET['id'])
 
 if ($student_id) {
   // Fetch student details based on the ID
-  $sql = "SELECT * FROM recommendation_of_supervisors WHERE id = $student_id";
+  $sql = "SELECT * FROM recommmendation_of_supervisors WHERE id = $student_id";
   
   $result = mysqli_query($conn, $sql);
 
@@ -213,7 +213,7 @@ if ($student_id) {
 
     <div class="commentPreview mt-5">
       <p class="text-center title">Comment by PG College committee</p>
-      <p class="text-center"><?php echo htmlspecialchars($formData3['collegePG_comment']); ?></p>
+      <p class="text-center"><?php echo htmlspecialchars($formData3['pgcommittee_comment']); ?></p>
     </div>
 
     <!-- Comment -->

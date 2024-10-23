@@ -37,9 +37,9 @@ $result = mysqli_query($conn, $sql);
 
 </head>
 <body>
-    <img class="preview-logo" src="./img/CU_LOGO.jpg" alt="" />
+    <img class="preview-logo mt-3" src="./img/CU_LOGO.jpg" alt="" />
     <div class="text-center">
-      <p>Recommendation for appointment of supervisors</p>
+      <p>Approval Status of Recommendation for appointment of supervisors</p>
       <p>(Masters Degree)</p>
     </div>
 
@@ -89,10 +89,6 @@ $result = mysqli_query($conn, $sql);
     ?>
 
 </body>
-
-<script>
-    const body = document.querySelector("body");
-</script>
 
 <script src="./form.js"></script>
 

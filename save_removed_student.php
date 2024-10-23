@@ -75,6 +75,26 @@ if ($stmt = $conn->prepare($sql_collegeDean)) {
     echo "Error preparing college_dean_attended_students statement: " . $conn->error . "\n";
 }
 
+// Fourth query: Update the college_dean_attended_students table
+$sql_subDean = "UPDATE sub_dean_attended_students 
+           SET endorsed_at = NOW() 
+           WHERE stud_name = ? AND matric_num = ?";
+
+if ($stmt = $conn->prepare($sql_subDean)) {
+    $stmt->bind_param("ss", $student['name'], $student['matric_number']);
+    $stmt->execute();
+
+    if ($stmt->affected_rows > 0) {
+        echo "Student updated successfully in sub_dean_attended_students.\n";
+    } else {
+        echo "Error updating student in sub_dean_attended_students or no rows affected.\n";
+    }
+
+    $stmt->close();
+} else {
+    echo "Error preparing sub_dean_attended_students statement: " . $conn->error . "\n";
+}
+
 // Close database connection
 $conn->close();
 ?>

@@ -18,7 +18,7 @@ $insertSql = "INSERT INTO college_dean_pending_students (id, stud_name, matric_n
                 (SELECT stud_name, matric_num FROM college_dean_pending_students)
                 AND (stud_name, matric_num) NOT IN 
                 (SELECT stud_name, matric_num FROM college_dean_attended_students)
-            ";
+              ";
 
 // Execute the insert query and check for errors
 if (!mysqli_query($conn, $insertSql)) {
@@ -55,7 +55,7 @@ mysqli_close($conn);
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>College PG SECTION</title>
+  <title>COLLEGE DEAN SECTION</title>
   <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css" />
   <link rel="stylesheet" href="./styles.css" />
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
