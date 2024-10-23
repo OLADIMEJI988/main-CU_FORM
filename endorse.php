@@ -1,6 +1,6 @@
 <?php
 // Connect to the database
-$conn = mysqli_connect('localhost', 'sholanke', 'shinnely_JR1', 'appoint_supe');
+$conn = mysqli_connect('localhost', 'sholanke', 'shinnely_JR1', 'recommend_supe');
 
 // Check connection
 if (!$conn) {
@@ -12,13 +12,11 @@ $studName = "";
 $formData = [];
 
 // Get student ID from the URL
-$student_id = isset($_GET['id']) ? mysqli_real_escape_string($conn, $_GET['id']) : null;
+$student_id = isset($_GET['id']) ? mysqli_real_escape_string($conn, $_GET['id']) : 0;
 
 if ($student_id) {
   // Fetch student details based on the ID
-  $sql = "SELECT stud_name, matric_num, programme, college, degree, first_reg_date, recent_reg_date, senate_approval_date, thesis_title, supervisor_name,
-          supervisor_rank, supervisor_institutional_affiliation, supervisor_department, supervisor_qualifications, supervisor_area_of_specialisation, 
-          co_supervisor_name, co_supervisor_rank, co_supervisor_institutional_affiliation, co_supervisor_department, co_supervisor_area_of_specialisation, co_supervisor_qualifications, comment FROM recommendation_of_supervisors WHERE id = $student_id";
+  $sql = "SELECT * FROM recommmendation_of_supervisors WHERE id = $student_id";
   
   $result = mysqli_query($conn, $sql);
 
@@ -210,59 +208,62 @@ mysqli_close($conn);
 
     <script>
       studentId = <?php echo $student_id ?>;
+      // When the Endorse button is clicked
       document.getElementById("endorseBtn").addEventListener("click", function () {
         const comment = document.getElementById("hodComment").value;
 
-        if(comment === ""){
+        if (comment === "") {
           alert("Comment section must not be empty");
-        } else{
-            const role = "hod";
-                    
-            // Send AJAX request to the PHP script
-            const xhr = new XMLHttpRequest();
-            xhr.open("POST", "insert.php?id=<?php echo isset($_GET['id']) ? intval($_GET['id']) : 0; ?>", true);
-            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        } else {
+          const role = "hod";
+          
+          // Send AJAX request to the PHP script
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", "insert.php?id=<?php echo isset($_GET['id']) ? intval($_GET['id']) : 0; ?>", true);
+          xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
-            // Pass the comment and the 'endorsed' action
-            xhr.send("comment=" + encodeURIComponent(comment) + "&action=endorsed" + "&role=" + encodeURIComponent(role));
+          // Pass the comment and the 'endorsed' action
+          xhr.send("comment=" + encodeURIComponent(comment) + "&action=endorsed" + "&role=" + encodeURIComponent(role));
 
-            xhr.onload = function () {
-              if (xhr.status === 200) {
-                alert("Endorsement successful");
-                window.location.href = 'hod_section.php?id=<?php echo $student_id ?>';
-              } else {
-                alert("Error submitting endorsement");
-              }
-            };
-          }
+          xhr.onload = function () {
+            if (xhr.status === 200) {
+              alert("Endorsement successful");
+              window.location.href = 'hod_section.php?id=<?php echo $student_id ?>';
+            } else {
+              alert("Error submitting endorsement");
+            }
+          };
+        }
       });
 
+      // When the Reject button is clicked
       document.getElementById("notEndorseBtn").addEventListener("click", function () {
         const comment = document.getElementById("hodComment").value;
 
-        if(comment === ""){
+        if (comment === "") {
           alert("Comment section must not be empty");
         } else {
-            const role = "hod";
+          const role = "hod";
 
-            // Send AJAX request to the PHP script
-            const xhr = new XMLHttpRequest();
-            xhr.open("POST", "insert.php?id=<?php echo isset($_GET['id']) ? intval($_GET['id']) : 0; ?>", true);
-            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+          // Send AJAX request to the PHP script
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", "insert.php?id=<?php echo isset($_GET['id']) ? intval($_GET['id']) : 0; ?>", true);
+          xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
-            // Pass the comment and the 'not endorsed' action
-            xhr.send("comment=" + encodeURIComponent(comment) + "&action=not endorsed" + "&role=" + encodeURIComponent(role));
+          // Pass the comment and the 'not endorsed' action
+          xhr.send("comment=" + encodeURIComponent(comment) + "&action=not endorsed" + "&role=" + encodeURIComponent(role));
 
-            xhr.onload = function () {
-              if (xhr.status === 200) {
-                alert("Successful");
-                window.location.href = 'hod_section.php?id=<?php echo $student_id ?>';
-              } else {
-                alert("Error submitting endorsement action");
-              }
-            };
-          }
+          xhr.onload = function () {
+            if (xhr.status === 200) {
+              alert("Rejection successful");
+              window.location.href = 'hod_section.php?id=<?php echo $student_id ?>';
+            } else {
+              alert("Error submitting rejection");
+            }
+          };
+        }
       });
+
     </script>
 
     <script src="./form.js"></script>

@@ -45,6 +45,7 @@
       <p class="text-center title">
         Recommendation for Appointment of Supervisors
       </p>
+      <p class="text-center title">(Masters Degree)</p>
 
       <form id="dataForm" action="get_details.php" method="POST">
         <div class="row g-3">
@@ -59,7 +60,7 @@
                 $select_query = mysqli_query($conn, "SELECT name FROM stud_info");
                 while ($studResult = mysqli_fetch_array($select_query)) {?>
                 <option><?php echo $studResult['name']; ?></option>
-                <?php } ?>
+                <?php }?>
               </select>
             </div>
 
@@ -187,7 +188,7 @@
                 <select id="supervisorName" name="supervisorName" style="width: 100%">
                   <option value=""></option>
                   <?php 
-                  $supeSelect_query = mysqli_query($conn, "SELECT name FROM approved_supervisors_info");
+                  $supeSelect_query = mysqli_query($conn, "SELECT name FROM approved_supe");
                   while ($supeResult = mysqli_fetch_array($supeSelect_query)) {?>
                   <option><?php echo $supeResult['name']; ?></option>
                   <?php } ?>
@@ -278,7 +279,7 @@
                 <select id="coSupervisorName" name="coSupervisorName" style="width: 100%">
                   <option value=""></option>
                   <?php 
-                  $coSupeSelect_query = mysqli_query($conn, "SELECT name FROM approved_cosupervisors_info");
+                  $coSupeSelect_query = mysqli_query($conn, "SELECT name FROM approved_cosupe");
                   while ($coSupeResult = mysqli_fetch_array($coSupeSelect_query)) {?>
                   <option><?php echo $coSupeResult['name']; ?></option>
                   <?php } ?>

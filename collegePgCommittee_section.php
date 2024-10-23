@@ -2,169 +2,182 @@
 session_start();
 
 // Connect to database
-$conn = mysqli_connect('localhost', 'sholanke', 'shinnely_JR1', 'appoint_supe');
+$conn = mysqli_connect('localhost', 'sholanke', 'shinnely_JR1', 'recommend_supe');
 
 // Check connection
 if (!$conn) {
-  die('Connection error: ' . mysqli_connect_error());
+    die('Connection error: ' . mysqli_connect_error());
 }
 
-// Fetch the students from the database
-$sql = "SELECT id, stud_name, matric_num FROM recommendation_of_supervisors WHERE comment IS NOT NULL";
+// Insert initial data into hod_pending_students from recommendation_of_supervisors
+$insertSql = "INSERT INTO pgcommittee_pending_students (id, stud_name, matric_num, arrived_at) 
+                SELECT id, stud_name, matric_num, endorsed_at 
+                FROM hod_attended_students 
+                WHERE hod_comment IS NOT NULL 
+                AND (stud_name, matric_num) NOT IN 
+                (SELECT stud_name, matric_num FROM pgcommittee_pending_students)
+                AND (stud_name, matric_num) NOT IN 
+                (SELECT stud_name, matric_num FROM pgcommittee_attended_students)
+            ";
+
+// Execute the insert query and check for errors
+if (!mysqli_query($conn, $insertSql)) {
+    error_log('Insert error: ' . mysqli_error($conn)); // Log any errors
+}
+
+// Fetch the students from the database, excluding those already in hod_pending_students and hod_attended_students
+$sql = "SELECT id, stud_name, matric_num FROM hod_attended_students WHERE hod_comment IS NOT NULL";
+
 $result = mysqli_query($conn, $sql);
 $students = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 $studentJs = json_encode($students);
-// echo $studentJs;
-
 $student_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+
+// Fetch removed students from the hod_attended_students table
+$removedStudents = [];
+$removedSql = "SELECT stud_name, matric_num FROM pgcommittee_attended_students";
+$removedResult = mysqli_query($conn, $removedSql);
+if ($removedResult && mysqli_num_rows($removedResult) > 0) {
+    while ($row = mysqli_fetch_assoc($removedResult)) {
+        $removedStudents[] = $row;
+    }
+}
+$removedStudentsJs = json_encode($removedStudents);
 
 // Free result set and close the connection
 mysqli_free_result($result);
 mysqli_close($conn);
-
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PG Committee section</title>
-    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="./styles.css" />
-    <style>
-      .char-counter.warning {
-        color: red;
-      }
-    </style>
-  </head>
-  <body class="preview-page">
-    <img class="preview-logo" src="./img/CU_LOGO.jpg" alt="" />
-    <div class="text-center">
-      <p>Recommendation for appointment of supervisors</p>
-      <p>(Masters Degree)</p>
-    </div>
-    <p class="title">Pending Students</p>
-    <div class="row mt-4">
-      <p class="col-1">S/N</p>
-      <p class="col-4">Student Name</p>
-      <p class="col-3">Matric Number</p>
-      <p class="col-3">Action</p>
-    </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>College PG SECTION</title>
+  <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css" />
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body class="preview-page">
+  <img class="preview-logo" src="./img/CU_LOGO.jpg" alt="" />
+  <div class="text-center">
+    <p>Recommendation for appointment of supervisors</p>
+    <p>(Masters Degree)</p>
+  </div>
+  <p class="title">Pending Students</p>
+  <div class="row mt-4">
+    <p class="col-1">S/N</p>
+    <p class="col-4">Student Name</p>
+    <p class="col-3">Matric Number</p>
+    <p class="col-3">Action</p>
+  </div>
 
-    <script>
-      const studId = <?php echo $student_id ?>;
-      const removedStudents = JSON.parse(localStorage.getItem("removedStudents"));
+  <script>
+        const studentJs = <?php echo $studentJs ?>;
+        const removedStudents = <?php echo $removedStudentsJs ?>;
+        let students;
 
-      let storedStudentList = JSON.parse(localStorage.getItem("updatedStudentList"));
-      const studentJs = <?php echo $studentJs ?>;
-      let students;
-
-      if(storedStudentList && storedStudentList.length > 0){
-        students = storedStudentList;
-
-        const poppedArray = JSON.parse(localStorage.getItem("excludedStudents")) || [];
-        const serializeObject = (obj) => {
-          const keys = Object.keys(obj).sort();
-          return keys.map(key => `${key}:${obj[key]}`).join('|');
-        };
-
-        const serializedArray1 = new Set(poppedArray.map(serializeObject));
-        console.log(serializedArray1);
-        students = removedStudents.filter(item => !serializedArray1.has(serializeObject(item)));
-      } else {
-        students = studentJs;
-      }
-
-      let excludedStudents = JSON.parse(localStorage.getItem("excludedStudents")) || [];
-
-      if(studId > 0){   
-        const updatedStudentList = students.filter((item)=> {
-          if(studId == item.id){
-            excludedStudents.push(item);
-            return false; 
-          } else {
-            return true;
-          }
+        // Fetch hod_pending_students if it exists
+        $.ajax({
+            url: 'fetch_pgcommittee_pending_students.php',
+            method: 'GET',
+            success: function(pgCommitteePendingStudents) {
+            if (pgCommitteePendingStudents && pgCommitteePendingStudents.length > 0) {
+                students = pgCommitteePendingStudents; 
+            } else {
+                students = studentJs;
+            }
+            renderStudents();
+            },
+            error: function() {
+            students = studentJs;
+            renderStudents();
+            }
         });
 
-        localStorage.setItem("excludedStudents", JSON.stringify(excludedStudents)); // Updating localStorage of attended students
-        localStorage.setItem("updatedStudentList", JSON.stringify(updatedStudentList)); // Updating student list
-        students = updatedStudentList; // Updating students variable to reflect updated student list
-      }
+        const studId = <?php echo $student_id ?>;
 
-      const body = document.querySelector("body");   
+        // Function to render students in the DOM
+        function renderStudents() {
+            const body = document.querySelector("body");
+            
+            // Clear existing students from the DOM
+            const existingStudents = document.querySelectorAll('.holder');
+            existingStudents.forEach(studentDiv => studentDiv.remove());
 
-      // Render attended students from hod section in the DOM
-      if (studId == 0) {
-        removedStudents.map((student, index) => {
-          const studentDiv = document.createElement("div");
-          const numField = document.createElement("p");
-          const actionLink = document.createElement("a");
-          const action = document.createElement("button");
-          
-          actionLink.className = "col-3";
-          actionLink.href =  `./collegePgEndorse.php?id=${student.id}`;
-          action.className = "endorseBtn";
-          action.textContent = "Click to endorse";
-          
-          numField.className = "col-1";
-          studentDiv.className = "row mt-2 holder";
-          
-          const nameField = document.createElement("p");
-          nameField.className = "stud-name-text col-4";
-          
-          const matricField = document.createElement("p");
-          matricField.className = "stud-matric-text col-3";
-          
-          numField.textContent = ++index;
-          nameField.textContent = student.stud_name;
-          matricField.textContent = student.matric_num;
+            if (studId > 0) {
+            let removedStudent = null;
+            students = students.filter((item) => {
+                if (studId == item.id) {
+                removedStudent = item; 
+                return false;
+                }
+                return true; 
+            });
 
-          actionLink.appendChild(action);
-          studentDiv.appendChild(numField);
-          studentDiv.appendChild(nameField);
-          studentDiv.appendChild(matricField);
-          studentDiv.appendChild(actionLink);
-          body.append(studentDiv);
-        });
-      } else if (studId > 0) {
-        students.map((student, index) => {
-          const studentDiv = document.createElement("div");
-          const numField = document.createElement("p");
-          const actionLink = document.createElement("a");
-          const action = document.createElement("button");
-          
-          actionLink.className = "col-3";
-          actionLink.href =  `./collegePgEndorse.php?id=${student.id}`;
-          action.className = "endorseBtn";
-          action.textContent = "Click to endorse";
-          
-          numField.className = "col-1";
-          studentDiv.className = "row mt-2 holder";
-          
-          const nameField = document.createElement("p");
-          nameField.className = "stud-name-text col-4";
-          
-          const matricField = document.createElement("p");
-          matricField.className = "stud-matric-text col-3";
-          
-          numField.textContent = ++index;
-          nameField.textContent = student.stud_name;
-          matricField.textContent = student.matric_num;
+            if (removedStudent) {
+                // Send AJAX request to update the database
+                $.ajax({
+                url: 'save_removed_student.php',
+                method: 'POST',
+                data: { student: JSON.stringify(removedStudent) },
+                success: function() {
+                    // Removing the student from the hod pending students list after endorsement/rejection
+                    $.ajax({
+                    url: 'remove_student.php',
+                    method: 'POST',
+                    data: { student_id: studId },
+                    success: function() {
+                        renderStudents();
+                    },
+                    error: function() {
+                        alert("Error removing student from hod_pending_students");
+                    }
+                    });
+                },
+                error: function() {
+                    alert("Error processing action");
+                }
+                });
+            }
+            }
 
-          actionLink.appendChild(action);
-          studentDiv.appendChild(numField);
-          studentDiv.appendChild(nameField);
-          studentDiv.appendChild(matricField);
-          studentDiv.appendChild(actionLink);
-          body.append(studentDiv);
-        });
-      }
+            // Render students in the DOM
+            students.map((student, index) => {
+            const studentDiv = document.createElement("div");
+            const numField = document.createElement("p");
+            const actionLink = document.createElement("a");
+            const action = document.createElement("button");
+            
+            actionLink.className = "col-3";
+            actionLink.href = `./collegePgEndorse.php?id=${student.id}`;
+            action.className = "endorseBtn";
+            action.textContent = "Click to endorse";
+            
+            numField.className = "col-1";
+            studentDiv.className = "row mt-2 holder";
+            
+            const nameField = document.createElement("p");
+            nameField.className = "stud-name-text col-4";
+            
+            const matricField = document.createElement("p");
+            matricField.className = "stud-matric-text col-3";
+            
+            numField.textContent = ++index;
+            nameField.textContent = student.stud_name;
+            matricField.textContent = student.matric_num;
 
-    </script>
+            actionLink.appendChild(action);
+            studentDiv.appendChild(numField);
+            studentDiv.appendChild(nameField);
+            studentDiv.appendChild(matricField);
+            studentDiv.appendChild(actionLink);
+            body.append(studentDiv);
+            });
+        }
+  </script>  
 
-    <script src="./form.js"></script>
-  </body>
+</body>
 </html>

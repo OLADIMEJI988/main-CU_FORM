@@ -2,27 +2,52 @@
 session_start();
 
 // Connect to database
-$conn = mysqli_connect('localhost', 'sholanke', 'shinnely_JR1', 'appoint_supe');
+$conn = mysqli_connect('localhost', 'sholanke', 'shinnely_JR1', 'recommend_supe');
 
 // Check connection
 if (!$conn) {
-  die('Connection error: ' . mysqli_connect_error());
+    die('Connection error: ' . mysqli_connect_error());
 }
 
-// Fetch the students from the database
-$sql = "SELECT id, stud_name, matric_num FROM recommendation_of_supervisors WHERE hod_comment IS NOT NULL";
+// Insert initial data into hod_pending_students from recommendation_of_supervisors
+$insertSql = "INSERT INTO hod_pending_students (id, stud_name, matric_num, arrived_at) 
+                SELECT id, stud_name, matric_num, created_at 
+                FROM recommmendation_of_supervisors 
+                WHERE comment IS NOT NULL 
+                AND (stud_name, matric_num) NOT IN 
+                (SELECT stud_name, matric_num FROM hod_pending_students)
+                AND (stud_name, matric_num) NOT IN 
+                (SELECT stud_name, matric_num FROM hod_attended_students)
+            ";
+
+// Execute the insert query and check for errors
+if (!mysqli_query($conn, $insertSql)) {
+    error_log('Insert error: ' . mysqli_error($conn)); // Log any errors
+}
+
+// Fetch the students from the database, excluding those already in hod_pending_students and hod_attended_students
+$sql = "SELECT id, stud_name, matric_num FROM recommmendation_of_supervisors WHERE comment IS NOT NULL";
+
 $result = mysqli_query($conn, $sql);
 $students = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 $studentJs = json_encode($students);
-// echo $studentJs;
-
 $student_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+
+// Fetch removed students from the hod_attended_students table
+$removedStudents = [];
+$removedSql = "SELECT stud_name, matric_num FROM hod_attended_students";
+$removedResult = mysqli_query($conn, $removedSql);
+if ($removedResult && mysqli_num_rows($removedResult) > 0) {
+    while ($row = mysqli_fetch_assoc($removedResult)) {
+        $removedStudents[] = $row;
+    }
+}
+$removedStudentsJs = json_encode($removedStudents);
 
 // Free result set and close the connection
 mysqli_free_result($result);
 mysqli_close($conn);
-
 ?>
 
 <!DOCTYPE html>
@@ -33,6 +58,7 @@ mysqli_close($conn);
   <title>HOD SECTION</title>
   <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css" />
   <link rel="stylesheet" href="./styles.css" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body class="preview-page">
   <img class="preview-logo" src="./img/CU_LOGO.jpg" alt="" />
@@ -49,79 +75,109 @@ mysqli_close($conn);
   </div>
 
   <script>
-    let storedFilteredArray = JSON.parse(localStorage.getItem("filteredArray"));
-    const studentJs = <?php echo $studentJs ?>;
-    let students;
+        const studentJs = <?php echo $studentJs ?>;
+        const removedStudents = <?php echo $removedStudentsJs ?>;
+        let students;
 
-    if(storedFilteredArray && storedFilteredArray.length > 0){
-      students = storedFilteredArray;
+        // Fetch hod_pending_students if it exists
+        $.ajax({
+            url: 'fetch_hod_pending_students.php',
+            method: 'GET',
+            success: function(hodPendingStudents) {
+            if (hodPendingStudents && hodPendingStudents.length > 0) {
+                students = hodPendingStudents; 
+            } else {
+                students = studentJs;
+            }
+            renderStudents();
+            },
+            error: function() {
+            students = studentJs;
+            renderStudents();
+            }
+        });
 
-      const poppedArray = JSON.parse(localStorage.getItem("removedStudents")) || [];
-      const serializeObject = (obj) => {
-        const keys = Object.keys(obj).sort();
-        return keys.map(key => `${key}:${obj[key]}`).join('|');
-      };
+        const studId = <?php echo $student_id ?>;
 
-      const serializedArray1 = new Set(poppedArray.map(serializeObject));
-      students = studentJs.filter(item => !serializedArray1.has(serializeObject(item)));
-    } else {
-      students = studentJs;
-    }
+        // Function to render students in the DOM
+        function renderStudents() {
+            const body = document.querySelector("body");
+            
+            // Clear existing students from the DOM
+            const existingStudents = document.querySelectorAll('.holder');
+            existingStudents.forEach(studentDiv => studentDiv.remove());
 
-    const studId = <?php echo $student_id ?>;
+            if (studId > 0) {
+            let removedStudent = null;
+            students = students.filter((item) => {
+                if (studId == item.id) {
+                removedStudent = item; 
+                return false;
+                }
+                return true; 
+            });
 
-    let removedStudents = JSON.parse(localStorage.getItem("removedStudents")) || [];
+            if (removedStudent) {
+                // Send AJAX request to update the database
+                $.ajax({
+                url: 'save_removed_student.php',
+                method: 'POST',
+                data: { student: JSON.stringify(removedStudent) },
+                success: function() {
+                    // Removing the student from the hod pending students list after endorsement/rejection
+                    $.ajax({
+                    url: 'remove_student.php',
+                    method: 'POST',
+                    data: { student_id: studId },
+                    success: function() {
+                        renderStudents();
+                    },
+                    error: function() {
+                        alert("Error removing student from hod_pending_students");
+                    }
+                    });
+                },
+                error: function() {
+                    alert("Error processing action");
+                }
+                });
+            }
+            }
 
-    if(studId > 0){   
-      const filteredArray = students.filter((item)=> {
-        if(studId == item.id){
-          removedStudents.push(item);
-          return false; 
-        } else {
-          return true;
+            // Render students in the DOM
+            students.map((student, index) => {
+            const studentDiv = document.createElement("div");
+            const numField = document.createElement("p");
+            const actionLink = document.createElement("a");
+            const action = document.createElement("button");
+            
+            actionLink.className = "col-3";
+            actionLink.href = `./endorse.php?id=${student.id}`;
+            action.className = "endorseBtn";
+            action.textContent = "Click to endorse";
+            
+            numField.className = "col-1";
+            studentDiv.className = "row mt-2 holder";
+            
+            const nameField = document.createElement("p");
+            nameField.className = "stud-name-text col-4";
+            
+            const matricField = document.createElement("p");
+            matricField.className = "stud-matric-text col-3";
+            
+            numField.textContent = ++index;
+            nameField.textContent = student.stud_name;
+            matricField.textContent = student.matric_num;
+
+            actionLink.appendChild(action);
+            studentDiv.appendChild(numField);
+            studentDiv.appendChild(nameField);
+            studentDiv.appendChild(matricField);
+            studentDiv.appendChild(actionLink);
+            body.append(studentDiv);
+            });
         }
-      });
-
-      localStorage.setItem("removedStudents", JSON.stringify(removedStudents)); // Updating localStorage
-      localStorage.setItem("filteredArray", JSON.stringify(filteredArray)); // Updating filtered students
-      students = filteredArray; // Updating students variable to reflect filtered array
-    }
-
-    const body = document.querySelector("body");   
-
-    // Render students in the DOM
-    students.map((student, index) => {
-      const studentDiv = document.createElement("div");
-      const numField = document.createElement("p");
-      const actionLink = document.createElement("a");
-      const action = document.createElement("button");
-      
-      actionLink.className = "col-3";
-      actionLink.href =  `./endorse.php?id=${student.id}`;
-      action.className = "endorseBtn";
-      action.textContent = "Click to endorse";
-      
-      numField.className = "col-1";
-      studentDiv.className = "row mt-2 holder";
-      
-      const nameField = document.createElement("p");
-      nameField.className = "stud-name-text col-4";
-      
-      const matricField = document.createElement("p");
-      matricField.className = "stud-matric-text col-3";
-      
-      numField.textContent = ++index;
-      nameField.textContent = student.stud_name;
-      matricField.textContent = student.matric_num;
-
-      actionLink.appendChild(action);
-      studentDiv.appendChild(numField);
-      studentDiv.appendChild(nameField);
-      studentDiv.appendChild(matricField);
-      studentDiv.appendChild(actionLink);
-      body.append(studentDiv);
-    });
-  </script>    
+  </script>  
 
 </body>
 </html>

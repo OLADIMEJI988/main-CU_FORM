@@ -2,7 +2,7 @@
 session_start();
 
 // Connect to database
-$conn = mysqli_connect('localhost', 'sholanke', 'shinnely_JR1', 'appoint_supe');
+$conn = mysqli_connect('localhost', 'sholanke', 'shinnely_JR1', 'recommend_supe');
 
 // Check connection
 if (!$conn) {
@@ -53,7 +53,7 @@ if (isset($_POST['supervisorName']) && empty($_POST['studName']) && empty($_POST
   $name = mysqli_real_escape_string($conn, $_POST['supervisorName']);
     
   // Query for supervisor info based on the selected name
-  $sqlSupervisors = "SELECT * FROM approved_supervisors_info WHERE name = '$name' LIMIT 1";
+  $sqlSupervisors = "SELECT * FROM approved_supe WHERE name = '$name' LIMIT 1";
   $supervisorResult = mysqli_query($conn, $sqlSupervisors);
 
   if (mysqli_num_rows($supervisorResult) > 0) {
@@ -74,7 +74,7 @@ if (isset($_POST['coSupervisorName']) && empty($_POST['studName']) && empty($_PO
   $name = mysqli_real_escape_string($conn, $_POST['coSupervisorName']);
     
   // Query for co-supervisor info based on the selected name
-  $sqlCoSupervisors = "SELECT * FROM approved_cosupervisors_info WHERE name = '$name' LIMIT 1";
+  $sqlCoSupervisors = "SELECT * FROM approved_cosupe WHERE name = '$name' LIMIT 1";
   $coSupervisorResult = mysqli_query($conn, $sqlCoSupervisors);
 
   if (mysqli_num_rows($coSupervisorResult) > 0) {
@@ -143,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     ];
 
   // Prepare the SQL query to insert data into the recommendation_of_supervisors table
-  $sqlInsert = "INSERT INTO recommendation_of_supervisors 
+  $sqlInsert = "INSERT INTO recommmendation_of_supervisors 
                 (stud_name, matric_num, programme, college, degree, first_reg_date, recent_reg_date, senate_approval_date, thesis_title, supervisor_name, supervisor_rank, supervisor_institutional_affiliation, supervisor_department, supervisor_qualifications, supervisor_area_of_specialisation, co_supervisor_name, co_supervisor_rank, co_supervisor_institutional_affiliation, co_supervisor_department, co_supervisor_qualifications, co_supervisor_area_of_specialisation, comment)
                 VALUES 
                 ('$studName', '$studMatricNum', '$studProgramme', '$studCollege', '$studDegree', '$firstReg', '$recentReg', '$approvalDate', '$studThesis', '$supervisorName', '$supervisorRank', '$supervisorAffiliation', '$supervisorDepartment', '$supervisorQualification', '$supervisorSpecialisation', '$coSupervisorName', '$coSupervisorRank', '$coSupervisorAffiliation', '$coSupervisorDepartment', '$coSupervisorQualification', '$coSupervisorSpecialisation', '$comments')";

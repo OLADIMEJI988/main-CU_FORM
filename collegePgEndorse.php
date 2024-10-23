@@ -1,6 +1,6 @@
 <?php
 // Connect to the database
-$conn = mysqli_connect('localhost', 'sholanke', 'shinnely_JR1', 'appoint_supe');
+$conn = mysqli_connect('localhost', 'sholanke', 'shinnely_JR1', 'recommend_supe');
 
 // Check connection
 if (!$conn) {
@@ -16,13 +16,25 @@ $student_id = isset($_GET['id']) ? mysqli_real_escape_string($conn, $_GET['id'])
 
 if ($student_id) {
   // Fetch student details based on the ID
-  $sql = "SELECT * FROM recommendation_of_supervisors WHERE id = $student_id";
+  $sql = "SELECT * FROM recommmendation_of_supervisors WHERE id = $student_id";
   
   $result = mysqli_query($conn, $sql);
 
   // If a student is found, store the details in $formData
   if ($result && mysqli_num_rows($result) > 0) {
     $formData = mysqli_fetch_assoc($result);
+    $studName = $formData['stud_name'];
+  } else {
+    echo 'No student found with this ID.';
+  }
+
+  $sql2 = "SELECT hod_comment FROM hod_attended_students WHERE id = $student_id";
+  
+  $result2 = mysqli_query($conn, $sql2);
+
+  // If a student is found, store the details in $formData
+  if ($result2 && mysqli_num_rows($result2) > 0) {
+    $formData2 = mysqli_fetch_assoc($result2);
     $studName = $formData['stud_name'];
   } else {
     echo 'No student found with this ID.';
@@ -184,7 +196,7 @@ if ($student_id) {
 
     <div class="commentPreview mt-5">
       <p class="text-center title">Comment by HOD</p>
-      <p class="text-center"><?php echo htmlspecialchars($formData['hod_comment']); ?></p>
+      <p class="text-center"><?php echo htmlspecialchars($formData2['hod_comment']); ?></p>
     </div>
 
     <!-- Comment -->

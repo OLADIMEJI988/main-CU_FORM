@@ -28,6 +28,30 @@ if ($student_id) {
     echo 'No student found with this ID.';
   }
 
+  $sql2 = "SELECT hod_comment FROM hod_attended_students WHERE id = $student_id";
+  
+  $result2 = mysqli_query($conn, $sql2);
+
+  // If a student is found, store the details in $formData
+  if ($result2 && mysqli_num_rows($result2) > 0) {
+    $formData2 = mysqli_fetch_assoc($result2);
+    $studName = $formData['stud_name'];
+  } else {
+    echo 'No student found with this ID.';
+  }
+
+  $sql3 = "SELECT pgcommittee_comment FROM pgcommittee_attended_students WHERE id = $student_id";
+  
+  $result3 = mysqli_query($conn, $sql3);
+
+  // If a student is found, store the details in $formData
+  if ($result3 && mysqli_num_rows($result3) > 0) {
+    $formData3 = mysqli_fetch_assoc($result3);
+    $studName = $formData['stud_name'];
+  } else {
+    echo 'No student found with this ID.';
+  }
+
   mysqli_free_result($result);
 }
 ?>
@@ -184,12 +208,12 @@ if ($student_id) {
 
     <div class="commentPreview mt-5">
       <p class="text-center title">Comment by HOD</p>
-      <p class="text-center"><?php echo htmlspecialchars($formData['hod_comment']); ?></p>
+      <p class="text-center"><?php echo htmlspecialchars($formData2['hod_comment']); ?></p>
     </div>
 
     <div class="commentPreview mt-5">
       <p class="text-center title">Comment by PG College committee</p>
-      <p class="text-center"><?php echo htmlspecialchars($formData['collegePG_comment']); ?></p>
+      <p class="text-center"><?php echo htmlspecialchars($formData3['collegePG_comment']); ?></p>
     </div>
 
     <!-- Comment -->
