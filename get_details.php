@@ -16,24 +16,24 @@ if (isset($_POST['studName']) && empty($_POST['supervisorName']) && empty($_POST
   // Query to fetch the matric number based on the student's name
   $sqlMatric = "SELECT matric_num FROM stud_info WHERE name = ? LIMIT 1";
   $stmt = $conn->prepare($sqlMatric);
-  $stmt->bind_param("s", $name);  // Bind the name as a string
+  $stmt->bind_param("s", $name);  // Binding the name as a string
   $stmt->execute();
   $result = $stmt->get_result();
   
   if ($row = $result->fetch_assoc()) {
-      // Fetch the matric number
+      // Getting the matric number
       $matric_num = $row['matric_num'];
 
-      // Now use the matric number to fetch student details
+      // using the matric number to fetch student details
       $sqlStudentDetails = "SELECT * FROM stud_info WHERE matric_num = ? LIMIT 1";
       $stmt2 = $conn->prepare($sqlStudentDetails);
-      $stmt2->bind_param("s", $matric_num);  // Bind the matric number
+      $stmt2->bind_param("s", $matric_num);  // Binding the matric number
       $stmt2->execute();
       $resultDetails = $stmt2->get_result();
 
       if (mysqli_num_rows($resultDetails) > 0) {
           $studInfo = mysqli_fetch_assoc($resultDetails);
-          echo json_encode($studInfo); // Send the student details back as JSON
+          echo json_encode($studInfo); // Sending the student details back as JSON
       } else {
           echo json_encode(['error' => 'No student found with that matric number.']);
       }

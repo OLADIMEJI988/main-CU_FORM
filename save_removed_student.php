@@ -15,7 +15,7 @@ if (!isset($student['name']) || !isset($student['matric_number'])) {
     die('Invalid student data.');
 }
 
-// First query: Update the hod_attended_students table
+// First query to Update the hod_attended_students table
 $sql_hod = "UPDATE hod_attended_students 
             SET endorsed_at = NOW() 
             WHERE stud_name = ? AND matric_num = ?";
@@ -35,7 +35,7 @@ if ($stmt = $conn->prepare($sql_hod)) {
     echo "Error preparing hod_attended_students statement: " . $conn->error . "\n";
 }
 
-// Second query: Update the pgcommittee_attended_students table
+// Second query to Update the pgcommittee_attended_students table
 $sql_pg = "UPDATE pgcommittee_attended_students 
            SET endorsed_at = NOW() 
            WHERE stud_name = ? AND matric_num = ?";
@@ -55,7 +55,7 @@ if ($stmt = $conn->prepare($sql_pg)) {
     echo "Error preparing pgcommittee_attended_students statement: " . $conn->error . "\n";
 }
 
-// Third query: Update the college_dean_attended_students table
+// Third query to Update the college_dean_attended_students table
 $sql_collegeDean = "UPDATE college_dean_attended_students 
            SET endorsed_at = NOW() 
            WHERE stud_name = ? AND matric_num = ?";
@@ -75,7 +75,7 @@ if ($stmt = $conn->prepare($sql_collegeDean)) {
     echo "Error preparing college_dean_attended_students statement: " . $conn->error . "\n";
 }
 
-// Fourth query: Update the college_dean_attended_students table
+// Fourth query to Update the sub_dean_attended_students table
 $sql_subDean = "UPDATE sub_dean_attended_students 
            SET endorsed_at = NOW() 
            WHERE stud_name = ? AND matric_num = ?";
@@ -93,6 +93,26 @@ if ($stmt = $conn->prepare($sql_subDean)) {
     $stmt->close();
 } else {
     echo "Error preparing sub_dean_attended_students statement: " . $conn->error . "\n";
+}
+
+// Fifth query to Update the dean_attended_students table
+$sql_dean = "UPDATE dean_attended_students 
+           SET approved_at = NOW() 
+           WHERE stud_name = ? AND matric_num = ?";
+
+if ($stmt = $conn->prepare($sql_dean)) {
+    $stmt->bind_param("ss", $student['name'], $student['matric_number']);
+    $stmt->execute();
+
+    if ($stmt->affected_rows > 0) {
+        echo "Student updated successfully in dean_attended_students.\n";
+    } else {
+        echo "Error updating student in dean_attended_students or no rows affected.\n";
+    }
+
+    $stmt->close();
+} else {
+    echo "Error preparing dean_attended_students statement: " . $conn->error . "\n";
 }
 
 // Close database connection

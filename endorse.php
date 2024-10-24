@@ -208,7 +208,6 @@ mysqli_close($conn);
 
     <script>
       studentId = <?php echo $student_id ?>;
-      // When the Endorse button is clicked
       document.getElementById("endorseBtn").addEventListener("click", function () {
         const comment = document.getElementById("hodComment").value;
 
@@ -236,7 +235,7 @@ mysqli_close($conn);
         }
       });
 
-      // When the Reject button is clicked
+      // Event listener for the Reject button
       document.getElementById("notEndorseBtn").addEventListener("click", function () {
         const comment = document.getElementById("hodComment").value;
 

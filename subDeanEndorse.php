@@ -1,5 +1,5 @@
 <?php
-// Connect to the database
+
 $conn = mysqli_connect('localhost', 'sholanke', 'shinnely_JR1', 'recommend_supe');
 
 // Check connection
@@ -7,7 +7,6 @@ if (!$conn) {
   die('Connection error: ' . mysqli_connect_error());
 }
 
-// Initialize variables
 $studName = "";
 $formData = [];
 
@@ -32,7 +31,6 @@ if ($student_id) {
   
   $result2 = mysqli_query($conn, $sql2);
 
-  // If a student is found, store the details in $formData
   if ($result2 && mysqli_num_rows($result2) > 0) {
     $formData2 = mysqli_fetch_assoc($result2);
     $studName = $formData['stud_name'];
@@ -44,7 +42,6 @@ if ($student_id) {
   
   $result3 = mysqli_query($conn, $sql3);
 
-  // If a student is found, store the details in $formData
   if ($result3 && mysqli_num_rows($result3) > 0) {
     $formData3 = mysqli_fetch_assoc($result3);
     $studName = $formData['stud_name'];
@@ -56,7 +53,6 @@ if ($student_id) {
   
   $result4 = mysqli_query($conn, $sql4);
 
-  // If a student is found, store the details in $formData
   if ($result4 && mysqli_num_rows($result4) > 0) {
     $formData4 = mysqli_fetch_assoc($result4);
     $studName = $formData['stud_name'];

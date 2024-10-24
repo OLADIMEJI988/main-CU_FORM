@@ -9,8 +9,8 @@ if (!$conn) {
     die('Connection error: ' . mysqli_connect_error());
 }
 
-// Fetching students from college dean pending students
-$sql = "SELECT id, stud_name, matric_num FROM college_dean_pending_students";
+// Fetching students from dean pending students table
+$sql = "SELECT id, stud_name, matric_num FROM dean_pending_students";
 $result = mysqli_query($conn, $sql);
 
 $students = [];

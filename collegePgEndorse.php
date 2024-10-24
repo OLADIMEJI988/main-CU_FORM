@@ -7,7 +7,6 @@ if (!$conn) {
   die('Connection error: ' . mysqli_connect_error());
 }
 
-// Initialize variables
 $studName = "";
 $formData = [];
 
@@ -32,7 +31,6 @@ if ($student_id) {
   
   $result2 = mysqli_query($conn, $sql2);
 
-  // If a student is found, store the details in $formData
   if ($result2 && mysqli_num_rows($result2) > 0) {
     $formData2 = mysqli_fetch_assoc($result2);
     $studName = $formData['stud_name'];

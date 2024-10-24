@@ -1,13 +1,12 @@
 <?php
-// Connect to the database
-$conn = mysqli_connect('localhost', 'sholanke', 'shinnely_JR1', 'appoint_supe');
+
+$conn = mysqli_connect('localhost', 'sholanke', 'shinnely_JR1', 'recommend_supe');
 
 // Check connection
 if (!$conn) {
   die('Connection error: ' . mysqli_connect_error());
 }
 
-// Initialize variables
 $studName = "";
 $formData = [];
 
@@ -16,7 +15,7 @@ $student_id = isset($_GET['id']) ? mysqli_real_escape_string($conn, $_GET['id'])
 
 if ($student_id) {
   // Fetch student details based on the ID
-  $sql = "SELECT * FROM recommendation_of_supervisors WHERE id = $student_id";
+  $sql = "SELECT * FROM recommmendation_of_supervisors WHERE id = $student_id";
   
   $result = mysqli_query($conn, $sql);
 
@@ -27,6 +26,50 @@ if ($student_id) {
   } else {
     echo 'No student found with this ID.';
   }
+
+  $sql2 = "SELECT hod_comment FROM hod_attended_students WHERE id = $student_id";
+  
+  $result2 = mysqli_query($conn, $sql2);
+
+  if ($result2 && mysqli_num_rows($result2) > 0) {
+    $formData2 = mysqli_fetch_assoc($result2);
+    $studName = $formData['stud_name'];
+  } else {
+    echo 'No student found with this ID.';
+  }
+
+  $sql3 = "SELECT pgcommittee_comment FROM pgcommittee_attended_students WHERE id = $student_id";
+  
+  $result3 = mysqli_query($conn, $sql3);
+
+  if ($result3 && mysqli_num_rows($result3) > 0) {
+    $formData3 = mysqli_fetch_assoc($result3);
+    $studName = $formData['stud_name'];
+  } else {
+    echo 'No student found with this ID.';
+  }
+
+  $sql4 = "SELECT college_dean_comment FROM college_dean_attended_students WHERE id = $student_id";
+  
+  $result4 = mysqli_query($conn, $sql4);
+
+  if ($result4 && mysqli_num_rows($result4) > 0) {
+    $formData4 = mysqli_fetch_assoc($result4);
+    $studName = $formData['stud_name'];
+  } else {
+    echo 'No student found with this ID.';
+  }
+  
+  $sql5 = "SELECT sub_dean_comment FROM sub_dean_attended_students WHERE id = $student_id";
+  
+  $result5 = mysqli_query($conn, $sql5);
+
+  if ($result5 && mysqli_num_rows($result5) > 0) {
+    $formData5 = mysqli_fetch_assoc($result5);
+    $studName = $formData['stud_name'];
+  } else {
+    echo 'No student found with this ID.';
+  }  
 
   mysqli_free_result($result);
 }
@@ -184,22 +227,22 @@ if ($student_id) {
 
     <div class="commentPreview mt-5">
       <p class="text-center title">Comment by HOD</p>
-      <p class="text-center"><?php echo htmlspecialchars($formData['hod_comment']); ?></p>
+      <p class="text-center"><?php echo htmlspecialchars($formData2['hod_comment']); ?></p>
     </div>
 
     <div class="commentPreview mt-5">
       <p class="text-center title">Comment by PG College committee</p>
-      <p class="text-center"><?php echo htmlspecialchars($formData['collegePG_comment']); ?></p>
+      <p class="text-center"><?php echo htmlspecialchars($formData3['pgcommittee_comment']); ?></p>
     </div>
 
     <div class="commentPreview mt-5">
       <p class="text-center title">Comment by College Dean</p>
-      <p class="text-center"><?php echo htmlspecialchars($formData['collegeDean_comment']); ?></p>
+      <p class="text-center"><?php echo htmlspecialchars($formData4['college_dean_comment']); ?></p>
     </div>
 
     <div class="commentPreview mt-5">
       <p class="text-center title">Comment by Sub-Dean</p>
-      <p class="text-center"><?php echo htmlspecialchars($formData['subDean_comment']); ?></p>
+      <p class="text-center"><?php echo htmlspecialchars($formData5['sub_dean_comment']); ?></p>
     </div>
 
     <!-- Comment -->

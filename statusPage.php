@@ -63,7 +63,7 @@ $result = mysqli_query($conn, $sql);
 
             <?php
                 if (mysqli_num_rows($result) > 0) {
-                    // Fetch and display each row
+                    // Fetch and display
                     while ($row = mysqli_fetch_assoc($result)) {
                         echo "<tr>";
                         echo "<td>" . $row['stud_name'] . "</td>";

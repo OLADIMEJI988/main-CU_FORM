@@ -9,7 +9,7 @@ if (!$conn) {
     die('Connection error: ' . mysqli_connect_error());
 }
 
-// Fetch students from pgcommittee_pending_students
+// Fetch students from the pg committee pending students
 $sql = "SELECT id, stud_name, matric_num FROM pgcommittee_pending_students";
 $result = mysqli_query($conn, $sql);
 
@@ -20,7 +20,7 @@ if ($result && mysqli_num_rows($result) > 0) {
     }
 }
 
-// Return the data as JSON
+// Returning the data as JSON
 header('Content-Type: application/json');
 echo json_encode($students);
 

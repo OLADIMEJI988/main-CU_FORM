@@ -9,7 +9,6 @@ if (!$conn) {
     die('Connection error: ' . mysqli_connect_error());
 }
 
-// Insert initial data into hod_pending_students from recommendation_of_supervisors
 $insertSql = "INSERT INTO pgcommittee_pending_students (id, stud_name, matric_num, arrived_at) 
                 SELECT id, stud_name, matric_num, endorsed_at 
                 FROM hod_attended_students 
@@ -25,7 +24,6 @@ if (!mysqli_query($conn, $insertSql)) {
     error_log('Insert error: ' . mysqli_error($conn)); // Log any errors
 }
 
-// Fetch the students from the database, excluding those already in hod_pending_students and hod_attended_students
 $sql = "SELECT id, stud_name, matric_num FROM hod_attended_students WHERE hod_comment IS NOT NULL";
 
 $result = mysqli_query($conn, $sql);
@@ -34,7 +32,7 @@ $students = mysqli_fetch_all($result, MYSQLI_ASSOC);
 $studentJs = json_encode($students);
 $student_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-// Fetch removed students from the hod_attended_students table
+// Fetch removed students from the hod attended students table
 $removedStudents = [];
 $removedSql = "SELECT stud_name, matric_num FROM pgcommittee_attended_students";
 $removedResult = mysqli_query($conn, $removedSql);
@@ -79,7 +77,7 @@ mysqli_close($conn);
         const removedStudents = <?php echo $removedStudentsJs ?>;
         let students;
 
-        // Fetch hod_pending_students if it exists
+        // Fetch hod pending students if it exists
         $.ajax({
             url: 'fetch_pgcommittee_pending_students.php',
             method: 'GET',
