@@ -9,61 +9,51 @@ if (!$conn) {
     die('Connection error: ' . mysqli_connect_error());
 }
 
-$student_id = isset($_POST['student_id']) ? (int)$_POST['student_id'] : 0;
+$matric_number = isset($_POST['matric_num']) ? mysqli_real_escape_string($conn, $_POST['matric_num']) : '';
 
-if ($student_id > 0) {
-    $deleteSql = "DELETE FROM hod_pending_students WHERE id = $student_id";
+if (!empty($matric_number)) {
+    // Delete from hod_pending_students
+    $deleteSql = "DELETE FROM hod_pending_students WHERE matric_num = '$matric_number'";
     if (mysqli_query($conn, $deleteSql)) {
-        echo "Student removed successfully";
+        echo "Student removed from HOD pending list successfully.";
     } else {
-        echo "Error removing student: " . mysqli_error($conn);
+        echo "Error removing student from HOD pending list: " . mysqli_error($conn);
     }
-} else {
-    echo "Invalid student ID";
-}
 
-if ($student_id > 0) {
-    $deleteSql2 = "DELETE FROM pgcommittee_pending_students WHERE id = $student_id";
+    // Delete from pgcommittee_pending_students
+    $deleteSql2 = "DELETE FROM pgcommittee_pending_students WHERE matric_num = '$matric_number'";
     if (mysqli_query($conn, $deleteSql2)) {
-        echo "Student removed successfully";
+        echo "Student removed from PG Committee pending list successfully.";
     } else {
-        echo "Error removing student: " . mysqli_error($conn);
+        echo "Error removing student from PG Committee pending list: " . mysqli_error($conn);
     }
-} else {
-    echo "Invalid student ID";
-}
 
-if ($student_id > 0) {
-    $deleteSql3 = "DELETE FROM college_dean_pending_students WHERE id = $student_id";
+    // Delete from college_dean_pending_students
+    $deleteSql3 = "DELETE FROM college_dean_pending_students WHERE matric_num = '$matric_number'";
     if (mysqli_query($conn, $deleteSql3)) {
-        echo "Student removed successfully";
+        echo "Student removed from College Dean pending list successfully.";
     } else {
-        echo "Error removing student: " . mysqli_error($conn);
+        echo "Error removing student from College Dean pending list: " . mysqli_error($conn);
     }
-} else {
-    echo "Invalid student ID";
-}
 
-if ($student_id > 0) {
-    $deleteSql4 = "DELETE FROM sub_dean_pending_students WHERE id = $student_id";
+    // Delete from sub_dean_pending_students
+    $deleteSql4 = "DELETE FROM sub_dean_pending_students WHERE matric_num = '$matric_number'";
     if (mysqli_query($conn, $deleteSql4)) {
-        echo "Student removed successfully";
+        echo "Student removed from Sub Dean pending list successfully.";
     } else {
-        echo "Error removing student: " . mysqli_error($conn);
+        echo "Error removing student from Sub Dean pending list: " . mysqli_error($conn);
     }
-} else {
-    echo "Invalid student ID";
-}
 
-if ($student_id > 0) {
-    $deleteSql5 = "DELETE FROM dean_pending_students WHERE id = $student_id";
+    // Delete from dean_pending_students
+    $deleteSql5 = "DELETE FROM dean_pending_students WHERE matric_num = '$matric_number'";
     if (mysqli_query($conn, $deleteSql5)) {
-        echo "Student removed successfully";
+        echo "Student removed from Dean pending list successfully.";
     } else {
-        echo "Error removing student: " . mysqli_error($conn);
+        echo "Error removing student from Dean pending list: " . mysqli_error($conn);
     }
+
 } else {
-    echo "Invalid student ID";
+    echo "Invalid matric number";
 }
 
 mysqli_close($conn);

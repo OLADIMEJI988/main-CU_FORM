@@ -9,8 +9,8 @@ if (!$conn) {
     die('Connection error: ' . mysqli_connect_error());
 }
 
-$insertSql = "INSERT INTO hod_pending_students (id, stud_name, matric_num, arrived_at) 
-                SELECT id, stud_name, matric_num, created_at 
+$insertSql = "INSERT INTO hod_pending_students (matric_num, stud_name, arrived_at) 
+                SELECT matric_num, stud_name, created_at 
                 FROM recommmendation_of_supervisors 
                 WHERE comment IS NOT NULL 
                 AND (stud_name, matric_num) NOT IN 
@@ -24,13 +24,13 @@ if (!mysqli_query($conn, $insertSql)) {
     error_log('Insert error: ' . mysqli_error($conn)); 
 }
 
-$sql = "SELECT id, stud_name, matric_num FROM recommmendation_of_supervisors WHERE comment IS NOT NULL";
+$sql = "SELECT matric_num, stud_name FROM recommmendation_of_supervisors WHERE comment IS NOT NULL";
 
 $result = mysqli_query($conn, $sql);
 $students = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 $studentJs = json_encode($students);
-$student_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$student_matric_num = isset($_GET['matric_num']) ? $_GET['matric_num'] : '';
 
 // Fetch removed students from the hod attended students table
 $removedStudents = [];
@@ -95,7 +95,7 @@ mysqli_close($conn);
             }
         });
 
-        const studId = <?php echo $student_id ?>;
+        const matricNum = '<?php echo $student_matric_num ?>';
 
         // Function to render students in the DOM
         function renderStudents() {
@@ -105,10 +105,10 @@ mysqli_close($conn);
             const existingStudents = document.querySelectorAll('.holder');
             existingStudents.forEach(studentDiv => studentDiv.remove());
 
-            if (studId > 0) {
+            if (matricNum) {
             let removedStudent = null;
             students = students.filter((item) => {
-                if (studId == item.id) {
+                if (matricNum == item.matric_num) {
                 removedStudent = item; 
                 return false;
                 }
@@ -126,7 +126,7 @@ mysqli_close($conn);
                     $.ajax({
                     url: 'remove_student.php',
                     method: 'POST',
-                    data: { student_id: studId },
+                    data: { matric_num: matricNum },
                     success: function() {
                         renderStudents();
                     },
@@ -150,7 +150,7 @@ mysqli_close($conn);
             const action = document.createElement("button");
             
             actionLink.className = "col-3";
-            actionLink.href = `./endorse.php?id=${student.id}`;
+            actionLink.href = `./endorse.php?matric_num=${student.matric_num}`;
             action.className = "endorseBtn";
             action.textContent = "Click to endorse";
             

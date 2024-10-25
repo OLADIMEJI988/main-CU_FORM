@@ -27,6 +27,7 @@ $result = mysqli_query($conn, $sql);
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 30px;
         }
         th, td {
             border: 1px solid black;

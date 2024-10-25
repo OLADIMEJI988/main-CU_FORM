@@ -11,13 +11,12 @@ if (!$conn) {
 $studName = "";
 $formData = [];
 
-// Get student ID from the URL
-$student_id = isset($_GET['id']) ? mysqli_real_escape_string($conn, $_GET['id']) : 0;
+// Get student matric number from the URL
+$student_matric_num = isset($_GET['matric_num']) ? mysqli_real_escape_string($conn, $_GET['matric_num']) : '';
 
-if ($student_id) {
-  // Fetch student details based on the ID
-  $sql = "SELECT * FROM recommmendation_of_supervisors WHERE id = $student_id";
-  
+// Fetch student details based on the matric number
+if ($student_matric_num) {
+  $sql = "SELECT * FROM recommmendation_of_supervisors WHERE matric_num = '$student_matric_num'";
   $result = mysqli_query($conn, $sql);
 
   // If a student is found, store the details in $formData
@@ -25,7 +24,7 @@ if ($student_id) {
     $formData = mysqli_fetch_assoc($result);
     $studName = $formData['stud_name'];
   } else {
-    echo 'No student found with this ID.';
+    echo 'No student found with this matric number.';
   }
 
   mysqli_free_result($result);
@@ -207,7 +206,8 @@ mysqli_close($conn);
     
 
     <script>
-      studentId = <?php echo $student_id ?>;
+      const studentMatricNum = "<?php echo $student_matric_num ?>";
+
       document.getElementById("endorseBtn").addEventListener("click", function () {
         const comment = document.getElementById("hodComment").value;
 
@@ -218,7 +218,7 @@ mysqli_close($conn);
           
           // Send AJAX request to the PHP script
           const xhr = new XMLHttpRequest();
-          xhr.open("POST", "insert.php?id=<?php echo isset($_GET['id']) ? intval($_GET['id']) : 0; ?>", true);
+          xhr.open("POST", "insert.php?matric_num=" + encodeURIComponent(studentMatricNum), true);
           xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
           // Pass the comment and the 'endorsed' action
@@ -227,7 +227,7 @@ mysqli_close($conn);
           xhr.onload = function () {
             if (xhr.status === 200) {
               alert("Endorsement successful");
-              window.location.href = 'hod_section.php?id=<?php echo $student_id ?>';
+              window.location.href = 'hod_section.php?matric_num=' + encodeURIComponent(studentMatricNum);
             } else {
               alert("Error submitting endorsement");
             }
@@ -246,16 +246,16 @@ mysqli_close($conn);
 
           // Send AJAX request to the PHP script
           const xhr = new XMLHttpRequest();
-          xhr.open("POST", "insert.php?id=<?php echo isset($_GET['id']) ? intval($_GET['id']) : 0; ?>", true);
+          xhr.open("POST", "insert.php?matric_num=" + encodeURIComponent(studentMatricNum), true);
           xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
-          // Pass the comment and the 'not endorsed' action
-          xhr.send("comment=" + encodeURIComponent(comment) + "&action=not endorsed" + "&role=" + encodeURIComponent(role));
+          // Pass the comment and the 'rejection' action
+          xhr.send("comment=" + encodeURIComponent(comment) + "&action=rejected" + "&role=" + encodeURIComponent(role));
 
           xhr.onload = function () {
             if (xhr.status === 200) {
               alert("Rejection successful");
-              window.location.href = 'hod_section.php?id=<?php echo $student_id ?>';
+              window.location.href = 'hod_section.php?matric_num=' + encodeURIComponent(studentMatricNum);
             } else {
               alert("Error submitting rejection");
             }

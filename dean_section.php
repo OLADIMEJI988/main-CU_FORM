@@ -23,14 +23,13 @@ if (!mysqli_query($conn, $insertSql)) {
     error_log('Insert error: ' . mysqli_error($conn)); 
 }
 
-// Fetch the students from the database, excluding those already in sub-dean pending students and sub-dean attended students
 $sql = "SELECT id, stud_name, matric_num FROM sub_dean_attended_students WHERE sub_dean_comment IS NOT NULL";
 
 $result = mysqli_query($conn, $sql);
 $students = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 $studentJs = json_encode($students);
-$student_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$student_matric_num = isset($_GET['matric_num']) ? $_GET['matric_num'] : '';
 
 // Fetch removed students from the dean_attended_students table
 $removedStudents = [];
@@ -95,7 +94,7 @@ mysqli_close($conn);
             }
         });
 
-        const studId = <?php echo $student_id ?>;
+        const matricNum = '<?php echo $student_matric_num ?>';
 
         // Function to render students in the DOM
         function renderStudents() {
@@ -105,10 +104,10 @@ mysqli_close($conn);
             const existingStudents = document.querySelectorAll('.holder');
             existingStudents.forEach(studentDiv => studentDiv.remove());
 
-            if (studId > 0) {
+            if (matricNum) {
             let removedStudent = null;
             students = students.filter((item) => {
-                if (studId == item.id) {
+                if (matricNum == item.matric_num) {
                 removedStudent = item; 
                 return false;
                 }
@@ -126,7 +125,7 @@ mysqli_close($conn);
                     $.ajax({
                     url: 'remove_student.php',
                     method: 'POST',
-                    data: { student_id: studId },
+                    data: { matric_num: matricNum },
                     success: function() {
                         renderStudents();
                     },
@@ -150,7 +149,7 @@ mysqli_close($conn);
             const action = document.createElement("button");
             
             actionLink.className = "col-3";
-            actionLink.href = `./deanApproves.php?id=${student.id}`;
+            actionLink.href = `./deanApproves.php?matric_num=${student.matric_num}`;
             action.className = "endorseBtn";
             action.textContent = "Click to endorse";
             

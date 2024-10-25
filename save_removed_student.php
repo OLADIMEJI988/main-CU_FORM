@@ -15,7 +15,7 @@ if (!isset($student['name']) || !isset($student['matric_number'])) {
     die('Invalid student data.');
 }
 
-// First query to Update the hod_attended_students table
+// First query to Update the hod attended students table
 $sql_hod = "UPDATE hod_attended_students 
             SET endorsed_at = NOW() 
             WHERE stud_name = ? AND matric_num = ?";
@@ -35,7 +35,7 @@ if ($stmt = $conn->prepare($sql_hod)) {
     echo "Error preparing hod_attended_students statement: " . $conn->error . "\n";
 }
 
-// Second query to Update the pgcommittee_attended_students table
+// Second query to Update the pgcommittee attended students table
 $sql_pg = "UPDATE pgcommittee_attended_students 
            SET endorsed_at = NOW() 
            WHERE stud_name = ? AND matric_num = ?";
@@ -55,7 +55,7 @@ if ($stmt = $conn->prepare($sql_pg)) {
     echo "Error preparing pgcommittee_attended_students statement: " . $conn->error . "\n";
 }
 
-// Third query to Update the college_dean_attended_students table
+// Third query to Update the college dean attended students table
 $sql_collegeDean = "UPDATE college_dean_attended_students 
            SET endorsed_at = NOW() 
            WHERE stud_name = ? AND matric_num = ?";
@@ -75,7 +75,7 @@ if ($stmt = $conn->prepare($sql_collegeDean)) {
     echo "Error preparing college_dean_attended_students statement: " . $conn->error . "\n";
 }
 
-// Fourth query to Update the sub_dean_attended_students table
+// Fourth query to Update the sub-dean attended students table
 $sql_subDean = "UPDATE sub_dean_attended_students 
            SET endorsed_at = NOW() 
            WHERE stud_name = ? AND matric_num = ?";
@@ -95,7 +95,7 @@ if ($stmt = $conn->prepare($sql_subDean)) {
     echo "Error preparing sub_dean_attended_students statement: " . $conn->error . "\n";
 }
 
-// Fifth query to Update the dean_attended_students table
+// Fifth query to Update the dean attended students table
 $sql_dean = "UPDATE dean_attended_students 
            SET approved_at = NOW() 
            WHERE stud_name = ? AND matric_num = ?";

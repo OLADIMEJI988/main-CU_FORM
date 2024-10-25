@@ -11,11 +11,11 @@ $studName = "";
 $formData = [];
 
 // Get student ID from the URL
-$student_id = isset($_GET['id']) ? mysqli_real_escape_string($conn, $_GET['id']) : null;
+$student_matric_num = isset($_GET['matric_num']) ? mysqli_real_escape_string($conn, $_GET['matric_num']) : '';
 
-if ($student_id) {
+if ($student_matric_num) {
   // Fetch student details based on the ID
-  $sql = "SELECT * FROM recommmendation_of_supervisors WHERE id = $student_id";
+  $sql = "SELECT * FROM recommmendation_of_supervisors WHERE matric_num = '$student_matric_num'";
   
   $result = mysqli_query($conn, $sql);
 
@@ -24,10 +24,10 @@ if ($student_id) {
     $formData = mysqli_fetch_assoc($result);
     $studName = $formData['stud_name'];
   } else {
-    echo 'No student found with this ID.';
+    echo 'No student found with this matric number.';
   }
 
-  $sql2 = "SELECT hod_comment FROM hod_attended_students WHERE id = $student_id";
+  $sql2 = "SELECT hod_comment FROM hod_attended_students WHERE matric_num = '$student_matric_num'";
   
   $result2 = mysqli_query($conn, $sql2);
 
@@ -35,10 +35,10 @@ if ($student_id) {
     $formData2 = mysqli_fetch_assoc($result2);
     $studName = $formData['stud_name'];
   } else {
-    echo 'No student found with this ID.';
+    echo 'No student found with this matric number.';
   }
 
-  $sql3 = "SELECT pgcommittee_comment FROM pgcommittee_attended_students WHERE id = $student_id";
+  $sql3 = "SELECT pgcommittee_comment FROM pgcommittee_attended_students WHERE matric_num = '$student_matric_num'";
   
   $result3 = mysqli_query($conn, $sql3);
 
@@ -46,7 +46,7 @@ if ($student_id) {
     $formData3 = mysqli_fetch_assoc($result3);
     $studName = $formData['stud_name'];
   } else {
-    echo 'No student found with this ID.';
+    echo 'No student found with this matric number.';
   }
 
   mysqli_free_result($result);
@@ -236,7 +236,7 @@ if ($student_id) {
     </div>
 
     <script>
-      studentId = <?php echo $student_id ?>;
+      const studentMatricNum = "<?php echo $student_matric_num ?>";
       document.getElementById("endorseBtn").addEventListener("click", function () {
         const comment = document.getElementById("collegeDeanComment").value;
 
@@ -247,7 +247,7 @@ if ($student_id) {
                     
             // Send AJAX request to the PHP script
             const xhr = new XMLHttpRequest();
-            xhr.open("POST", "insert.php?id=<?php echo isset($_GET['id']) ? intval($_GET['id']) : 0; ?>", true);
+            xhr.open("POST", "insert.php?matric_num=" + encodeURIComponent(studentMatricNum), true);
             xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
             // Pass the comment and the 'endorsed' action
@@ -256,7 +256,7 @@ if ($student_id) {
             xhr.onload = function () {
               if (xhr.status === 200) {
                 alert("Endorsement successful");
-                window.location.href = 'collegeDean_section.php?id=<?php echo $student_id ?>';
+                window.location.href = 'collegeDean_section.php?matric_num=' + encodeURIComponent(studentMatricNum);
               } else {
                 alert("Error submitting endorsement");
               }
@@ -274,16 +274,16 @@ if ($student_id) {
 
             // Send AJAX request to the PHP script
             const xhr = new XMLHttpRequest();
-            xhr.open("POST", "insert.php?id=<?php echo isset($_GET['id']) ? intval($_GET['id']) : 0; ?>", true);
+            xhr.open("POST", "insert.php?matric_num=" + encodeURIComponent(studentMatricNum), true);
             xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
-            // Pass the comment and the 'not endorsed' action
-            xhr.send("comment=" + encodeURIComponent(comment) + "&action=not endorsed" + "&role=" + encodeURIComponent(role));
+            // Pass the comment and the 'rejection' action
+            xhr.send("comment=" + encodeURIComponent(comment) + "&action=rejected" + "&role=" + encodeURIComponent(role));
 
             xhr.onload = function () {
               if (xhr.status === 200) {
                 alert("Successful");
-                window.location.href = 'collegeDean_section.php?id=<?php echo $student_id ?>';
+                window.location.href = 'collegeDean_section.php?matric_num=' + encodeURIComponent(studentMatricNum);
               } else {
                 alert("Error submitting endorsement action");
               }
